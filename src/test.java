@@ -44,27 +44,14 @@ public class test {
 		W2.put(v1, 0.1f);
 		W2.put(v3, 0.05f);
 		W2.put(v4, 0.85f);
-		System.out.print("d1(W0,W2): ");
-		distance=D.getDistance1(W0, W2);
+		System.out.print("d1(W0,W1): ");
+		distance=D.getDistance1(W0, W1);
 		System.out.println(distance);
-		
-		/*
-		System.out.print("Workload0: ");
-		printQ(W0);
-		System.out.print("Workload1: ");
-		printQ(W1);
-		System.out.print("Workload2: ");
-		printQ(W2);
-		
-		System.out.print("d1(W2,W1): ");
-		distance=D.getDistance1(W2, W1);
-		System.out.println(distance);
-		D.w=0.1f;
 		System.out.println("Given w=0.1");
-		System.out.print("d2(W2,W1): ");
-		distance=D.getDistance2(W2, W1);
+		System.out.print("d2(W1,W0): ");
+		distance=D.getDistance2(W1, W0);
 		System.out.println(distance);
-		*/
+		
 	}
 
 	
