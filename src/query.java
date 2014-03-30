@@ -1,5 +1,5 @@
 
 public class query {
-	public int q;
+	public Boolean q[];
 	public float prob;
 }
