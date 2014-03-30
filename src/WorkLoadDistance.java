@@ -94,7 +94,6 @@ public class WorkLoadDistance {
 		
 		
 		
-		
 		return result;
 	}
 	
@@ -106,6 +105,16 @@ public class WorkLoadDistance {
 	private float getP(){
 		//generate float 0.01<=p<1
 	
+	}
+	boolean solveSQE(float a, float b, int k1, int k2, int k3,float x, float y){
+		//solve system of quadratic eqns
+//		x+y=a
+//		k1*x+k2*xy+k3*y=b
+	}
+	
+	boolean solveQuadraticEqn(float a, float b, float c, float sln1,float sln2){
+		//解一元二次方程！
+		//if delta < 0(no solution),return 0. else return 1
 	}
 	
 	public float getDistance2(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y) {
