@@ -132,6 +132,7 @@ public class test {
 	private static void largeCase1(){
 		int numColumn=20;
 		float distance;
+		float d;
 		WorkLoadDistance D = new WorkLoadDistance(20,0.01f);
 		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(5,numColumn);
 		System.out.println("W0: ");
@@ -143,11 +144,21 @@ public class test {
 		System.out.println("d1= "+distance);
 		distance=D.getDistance2(W0,W1);
 		System.out.println("d2= "+distance);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, -18f, 3);
+		d=-18f;
+		System.out.println("Given W0 and d(Y,W0)= "+d);
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 3);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
 		distance=D.getDistance1(Y,W0);
+		System.out.println("d(Y,W0)= "+distance);
+		}
+		
+		Y = D.randomizeY2(W0, d, 3);
+		System.out.println("Y: ");
+		printWorkLoad(Y);
+		if (Y!=null){
+		distance=D.getDistance2(Y,W0);
 		System.out.println("d(Y,W0)= "+distance);
 		}
 	}

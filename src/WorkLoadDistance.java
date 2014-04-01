@@ -253,10 +253,146 @@ public class WorkLoadDistance {
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY2(HashMap<Vector<Boolean> ,Float> X, float d,int k)
 	{
-		//+-d2(result-X)=d
+		//d2(result-X)=d
 		//x+y=1-subsum
+		HashMap<Vector<Boolean> ,Float> result=null;
+		if (X.size()>=2){
+			result=randomizeY22(X,d,k);
+		}
+		if (result==null)
+			return randomizeY21(X,d,k);
+		else
+			return result;
 	}
 	
+	public HashMap<Vector<Boolean> ,Float> randomizeY21(HashMap<Vector<Boolean> ,Float> X, float d,int k)
+	{
+		float arr[]=new float[2];
+		float dYp,rhs1,rhs2;
+		Float x=0f,y=0f;
+		float xparameter=0f,yparameter=0f,xyparameter=0f;
+		float subsum=0f;//sum of p
+		Vector<Boolean> vec = new Vector<Boolean>(numColumn);
+		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
+		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
+		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
+		HashMap<Vector<Boolean> ,Float> result = new HashMap<Vector<Boolean> ,Float>(k);
+		
+		while(true){
+			vec=genVector();
+			if (!X.containsKey(vec))
+				break;
+		}
+		result.put(vec, 0.1f);
+		xkey=vec;
+		while(true){
+			vec=genVector();
+			if (!X.containsKey(vec) && !result.containsKey(vec))
+				break;
+		}
+		ykey=vec;
+		result.put(vec, 0.1f);
+		/*
+		System.out.print("The two unknown queries:");
+		printWorkLoad(result);*/
+		//finish setup 2 unknown queries
+		subsum=randomInsertQuery(k-2,result,Yp);
+		//finish setup k-2 queries
+		/*
+		System.out.println("The other k-2 queries");
+		printWorkLoad(Yp);*/
+		rhs1=1-subsum;
+		dYp = getDistance1(Yp,X);	
+		rhs2 = d - dYp - w*getSigma(result,X);
+		
+		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
+		xparameter=getXParameter( YpminusX,xkey);
+		yparameter=getYParameter(YpminusX,ykey);
+		xyparameter=cValue(ykey,xkey)*2;
+		/*
+		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
+		System.out.println("x+y="+rhs1);*/
+		
+		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
+			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			return null;
+		}
+		x=arr[0];
+		y=arr[1];
+		result.put(xkey, x);
+		result.put(ykey, y);
+		return result;
+	}
+	
+	public HashMap<Vector<Boolean> ,Float> randomizeY22(HashMap<Vector<Boolean> ,Float> X, float d,int k)
+	{	//X.size()>=2 and quite big (close to 2^numColumn)
+		//higher change to get solution if d is small
+		//+-d1(result-X)=d
+		//x+y=1-subsum
+		int i,r1,r2;
+		float arr[]=new float[2];
+		float dYp,xvalue,yvalue,rhs1,rhs2;
+		float xparameter=0f,yparameter=0f,xyparameter=0f,subsum=0f;
+		Float x=0f,y=0f;
+		//Vector<Boolean> vec = new Vector<Boolean>(numColumn);
+		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
+		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
+		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
+		HashMap<Vector<Boolean> ,Float> result = new HashMap<Vector<Boolean> ,Float>(k);
+		r1=randomint(X.size()-1);
+		r2=randomint(X.size()-1);
+		while (r2==r1){
+			r2=randomint(X.size()-1);
+		}
+		i=0;
+		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
+			if (i==r1){
+				xkey=entry.getKey();
+				result.put(xkey, 0.1f);
+			}
+			else if (i==r2){
+				ykey=entry.getKey();
+				result.put(ykey, 0.1f);
+			}	
+			i++;
+		}
+		//finish setup 2 unknown queries
+		/*
+		System.out.print("The two unknown queries:");
+		printWorkLoad(result);*/
+		subsum=randomInsertQuery(k-2,result,Yp);
+		/*
+		System.out.println("The other k-2 queries");
+		printWorkLoad(Yp);*/
+		//finish setup k-2 queries
+		rhs1=1-subsum;
+		dYp = getDistance1(Yp,X);
+		rhs2 = d - dYp - w*getSigma(X,result);
+		
+		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
+		xvalue=YpminusX.remove(xkey);
+		xparameter=getXParameter(YpminusX,xkey);
+		YpminusX.put(xkey, xvalue);
+		yvalue=YpminusX.remove(ykey);
+		yparameter=getYParameter(YpminusX,ykey);
+		YpminusX.put(ykey, yvalue);
+		xyparameter=cValue(ykey,xkey)*2;
+		/*
+		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
+		System.out.println("x+y="+rhs1);*/
+		
+		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
+			/*rhs2 = -d-dYp;
+			solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,x, y);*/
+			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			return null;
+		}
+		x=arr[0];
+		y=arr[1];
+		result.put(xkey, x);
+		result.put(ykey, y);
+		return result;
+	}
 	
 	private Vector<Boolean> genVector(){
 		//random generate Vector<Boolean> with size numColumn
@@ -326,7 +462,10 @@ public class WorkLoadDistance {
 			else{
 				s[0]=x1[1];
 				s[1]=-x1[1]+a;
-				return true;
+				if (s[0]>0 && s[1]>0)
+					return true;
+				else
+					return false;
 			}
 		}	
 	}
