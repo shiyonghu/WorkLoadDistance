@@ -49,11 +49,9 @@ public class WorkLoadDistance {
 	
 	
 	public float getDistance1(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y){
-		//REQUIRE: queries in X,Y are in ascending order
 		float subsum;
 		float sum=0f;
 		Vector<Boolean> col;
-		
 		HashMap<Vector<Boolean> ,Float> XminusY = new HashMap<Vector<Boolean> ,Float>();
 		XminusY = subtract(X, Y);
 		
@@ -67,7 +65,6 @@ public class WorkLoadDistance {
 			}
 			sum+=subsum * entry.getValue();
 		}
-		
 		return sum;
 	}
 	public HashMap<Vector<Boolean> ,Float> randomizeY1(HashMap<Vector<Boolean> ,Float> X, float d,int k){
@@ -83,7 +80,7 @@ public class WorkLoadDistance {
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY11(HashMap<Vector<Boolean> ,Float> X, float d,int k)
 	{
-		//+-d1(result-X)=d
+		//d1(result-X)=d
 		//x+y=1-subsum
 		float arr[]=new float[2];
 		float dYp,rhs1,rhs2;
