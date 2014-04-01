@@ -28,7 +28,6 @@ public class WorkLoadDistance {
 		return count;
 	}
 	
-	
 	public HashMap<Vector<Boolean> ,Float> subtract(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y){
 		//return X-Y
 		float value;
@@ -43,10 +42,8 @@ public class WorkLoadDistance {
 			result.put(Key, value - entry.getValue());
 			
 		}//end of for
-		
 		return result;
 	}
-	
 	
 	public float getDistance1(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y){
 		float subsum;
@@ -67,15 +64,17 @@ public class WorkLoadDistance {
 		}
 		return sum;
 	}
+	
 	public HashMap<Vector<Boolean> ,Float> randomizeY1(HashMap<Vector<Boolean> ,Float> X, float d,int k){
 		HashMap<Vector<Boolean> ,Float> result=null;
-		if (X.size()>=2){
+		
+		result = randomizeY11(X,d,k);
+		if (result==null && X.size()>=2){
 			result=randomizeY12(X,d,k);
 		}
 		if (result==null)
-			return randomizeY11(X,d,k);
-		else
-			return result;
+			System.out.println("No solution this time. You may try again or change to a larger distance.");
+		return result;
 	}
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY11(HashMap<Vector<Boolean> ,Float> X, float d,int k)
@@ -107,15 +106,12 @@ public class WorkLoadDistance {
 		}
 		ykey=vec;
 		result.put(vec, 0f);
-		/*
-		System.out.print("The two unknown queries:");
-		printWorkLoad(result);*/
 		//finish setup 2 unknown queries
 		subsum=randomInsertQuery(k-2,result,Yp);
 		//finish setup k-2 queries
 		/*
 		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);*/
+		printWorkLoad(Yp);//debug*/
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
 		rhs2 = d - dYp;
@@ -124,12 +120,9 @@ public class WorkLoadDistance {
 		xparameter=getXParameter( YpminusX,xkey);
 		yparameter=getYParameter(YpminusX,ykey);
 		xyparameter=cValue(ykey,xkey)*2;
-		/*
-		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
-		System.out.println("x+y="+rhs1);*/
 		
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			//System.out.println("No solution this time. You may try again or change to a larger distance.");
 			return null;
 		}
 		x=arr[0];
@@ -213,14 +206,11 @@ public class WorkLoadDistance {
 			i++;
 		}
 		//finish setup 2 unknown queries
-		/*
-		System.out.print("The two unknown queries:");
-		printWorkLoad(result);*/
 		subsum=randomInsertQuery(k-2,result,Yp);
+		//finish setup k-2 queries
 		/*
 		System.out.println("The other k-2 queries");
 		printWorkLoad(Yp);*/
-		//finish setup k-2 queries
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);
 		rhs2 = d - dYp;
@@ -233,14 +223,8 @@ public class WorkLoadDistance {
 		yparameter=getYParameter(YpminusX,ykey);
 		YpminusX.put(ykey, yvalue);
 		xyparameter=cValue(ykey,xkey)*2;
-		/*
-		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
-		System.out.println("x+y="+rhs1);*/
-		
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			/*rhs2 = -d-dYp;
-			solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,x, y);*/
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			//System.out.println("No solution this time. You may try again or change to a larger distance.");
 			return null;
 		}
 		x=arr[0];
@@ -256,13 +240,13 @@ public class WorkLoadDistance {
 		//d2(result-X)=d
 		//x+y=1-subsum
 		HashMap<Vector<Boolean> ,Float> result=null;
-		if (X.size()>=2){
+		result= randomizeY21(X,d,k);
+		if (result==null && X.size()>=2){
 			result=randomizeY22(X,d,k);
 		}
 		if (result==null)
-			return randomizeY21(X,d,k);
-		else
-			return result;
+			System.out.println("No solution this time. You may try again or change to a larger distance.");
+		return result;
 	}
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY21(HashMap<Vector<Boolean> ,Float> X, float d,int k)
@@ -292,15 +276,9 @@ public class WorkLoadDistance {
 		}
 		ykey=vec;
 		result.put(vec, 0.1f);
-		/*
-		System.out.print("The two unknown queries:");
-		printWorkLoad(result);*/
 		//finish setup 2 unknown queries
 		subsum=randomInsertQuery(k-2,result,Yp);
 		//finish setup k-2 queries
-		/*
-		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);*/
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
 		rhs2 = d - dYp - w*getSigma(result,X);
@@ -309,12 +287,8 @@ public class WorkLoadDistance {
 		xparameter=getXParameter( YpminusX,xkey);
 		yparameter=getYParameter(YpminusX,ykey);
 		xyparameter=cValue(ykey,xkey)*2;
-		/*
-		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
-		System.out.println("x+y="+rhs1);*/
-		
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			//System.out.println("No solution this time. You may try again or change to a larger distance.");
 			return null;
 		}
 		x=arr[0];
@@ -334,7 +308,6 @@ public class WorkLoadDistance {
 		float dYp,xvalue,yvalue,rhs1,rhs2;
 		float xparameter=0f,yparameter=0f,xyparameter=0f,subsum=0f;
 		Float x=0f,y=0f;
-		//Vector<Boolean> vec = new Vector<Boolean>(numColumn);
 		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
 		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
 		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
@@ -357,13 +330,7 @@ public class WorkLoadDistance {
 			i++;
 		}
 		//finish setup 2 unknown queries
-		/*
-		System.out.print("The two unknown queries:");
-		printWorkLoad(result);*/
 		subsum=randomInsertQuery(k-2,result,Yp);
-		/*
-		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);*/
 		//finish setup k-2 queries
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);
@@ -377,14 +344,8 @@ public class WorkLoadDistance {
 		yparameter=getYParameter(YpminusX,ykey);
 		YpminusX.put(ykey, yvalue);
 		xyparameter=cValue(ykey,xkey)*2;
-		/*
-		System.out.println(xparameter+"x + "+xyparameter+"xy+ "+yparameter+"y = "+rhs2);
-		System.out.println("x+y="+rhs1);*/
-		
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			/*rhs2 = -d-dYp;
-			solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,x, y);*/
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			//System.out.println("No solution this time. You may try again or change to a larger distance.");
 			return null;
 		}
 		x=arr[0];
@@ -411,13 +372,11 @@ public class WorkLoadDistance {
 				temp.add(element);
 				if(!element) count++;
 			}
-			if(count < numColumn) 
-			{
+			if(count < numColumn) {
 				done = true;
 				result = temp;
 			}
 		}
-		
 		return result;
 	}
 	
@@ -429,10 +388,11 @@ public class WorkLoadDistance {
 	}
 	
 	private static float getP(int k) {
-		// generate float 0.01<=p<1
+		// generate float 0.01<=p<1/k
 		float result;
-		float floor = 1/k;
-		result = (float)(r.nextFloat()*(floor-0.01) + 0.01);
+		float floor =(float) 1/k;
+		floor-=0.01f;
+		result = (float)(r.nextFloat()*(floor) + 0.01);
 		return result;
 	}
 	
@@ -448,8 +408,6 @@ public class WorkLoadDistance {
 		a1=-k2;
 		b1=k1-k3+a*k2;
 		c1=a*(k3-k1)-b+k1*a;
-		/*
-		System.out.println(a1+"x^2+"+b1+"x+"+c1+"=0");*/
 		flag=!solveQuadraticEqn(a1,b1,c1,x1);
 		if (flag)
 			return false;
@@ -471,7 +429,6 @@ public class WorkLoadDistance {
 	}
 	
 	boolean solveQuadraticEqn(float a, float b, float c, float sln[]){
-		//解一元二次方程！
 		//if delta < 0(no solution),return 0. else return 1
 		//ax^2+bx+c=0
 		double delta;
@@ -489,8 +446,8 @@ public class WorkLoadDistance {
 	public float getDistance2(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y) {
 		float d1=getDistance1(X,Y);
 		int sum;
-		HashMap<Vector<Boolean> ,Float> Xcopy = X;
-		HashMap<Vector<Boolean> ,Float> Ycopy = Y;
+		HashMap<Vector<Boolean> ,Float> Xcopy = new HashMap<Vector<Boolean> ,Float>(X);
+		HashMap<Vector<Boolean> ,Float> Ycopy = new HashMap<Vector<Boolean> ,Float>(Y);
 		sum=getSigma(Xcopy,Ycopy);
 		return d1+w*sum;
 	}
@@ -508,11 +465,11 @@ public class WorkLoadDistance {
 		return sum;
 	}
 	
-	
 	//debug
-	public void printWorkLoad(HashMap<Vector<Boolean> ,Float> W)
+	public static void printWorkLoad(HashMap<Vector<Boolean> ,Float> W)
 	{
-		if (W.isEmpty()){
+		if (W==null){
+			System.out.println("WorkLoad is empty");
 			return;
 		}
 		for (Map.Entry<Vector<Boolean>,Float> entry: W.entrySet())
@@ -528,7 +485,7 @@ public class WorkLoadDistance {
 		System.out.print('\n');
 	}
 	
-	private int Bool2int(Boolean b){
+	private static int Bool2int(Boolean b){
 		int value;
 		if (b) value=1;
 		else value=0;
