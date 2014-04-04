@@ -77,8 +77,8 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//largeCase1();
-		smallCase();
+		largeCase1();
+		//smallCase();
 		
 	}
 	
@@ -117,16 +117,16 @@ public class test {
 		printWorkLoad(W1);
 		System.out.print("W2:");
 		printWorkLoad(W2);
-		System.out.print("d1(W0,W2): ");
-		distance=D.getDistance1(W0, W2);
+		System.out.print("d1(W0,W1): ");
+		distance=D.getDistance1(W2, W1);
 		System.out.println(distance);
 		System.out.println("Given w=0.1");
-		System.out.print("d2(W2,W0): ");
-		distance=D.getDistance2(W2, W0);
+		System.out.print("d2(W0,W1): ");
+		distance=D.getDistance2(W1, W2);
 		System.out.println(distance);
-		HashMap<Vector<Boolean> ,Float> Y=D.randomizeY1(W1, -1f, 4);
+		HashMap<Vector<Boolean> ,Float> Y=D.randomizeY11(W2, 4f, 4);
 		
-		System.out.print("f(W0,-0.015,4)=");
+		System.out.print("f(W0,0.015,4)=");
 		printWorkLoad(Y);
 		if (Y!=null){
 		System.out.print("d1(W0,Y): ");
@@ -138,7 +138,7 @@ public class test {
 	private static void largeCase1(){
 		int numColumn=20;//set numColumn
 		float distance;
-		float d=-5f;//set d
+		float d=35f;//set d
 		float w=0.1f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
@@ -150,7 +150,10 @@ public class test {
 		printWorkLoad(W1);
 		distance=D.getDistance1(W0,W1);
 		System.out.println("d1(W0,W1)= "+distance);
-		distance=D.getDistance2(W0,W1);
+		distance=D.getDistance1(W0,W1);
+		
+		System.out.println("d1(W1,W0)= "+distance);
+		distance=D.getDistance1(W1,W0);
 		System.out.println("d2(W0,W1)= "+distance);
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
 		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 4);
@@ -158,9 +161,9 @@ public class test {
 		printWorkLoad(Y);
 		if (Y!=null){
 		distance=D.getDistance1(Y,W0);
-		System.out.println("d(Y,W0)= "+distance);
+		System.out.println("d1(Y,W0)= "+distance);
 		}
-		
+		/*
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
 		Y = D.randomizeY2(W0, d, 4);
 		System.out.println("Y: ");
@@ -169,6 +172,7 @@ public class test {
 		distance=D.getDistance2(Y,W0);
 		System.out.println("d(Y,W0)= "+distance);
 		}
+		*/
 	}
 	
 }

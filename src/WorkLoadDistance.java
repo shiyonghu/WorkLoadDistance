@@ -39,7 +39,7 @@ public class WorkLoadDistance {
 				value =  (float) result.get(Key);
 			else
 				value = 0;
-			result.put(Key, value - entry.getValue());
+			result.put(Key, Math.abs(value - entry.getValue()));
 			
 		}//end of for
 		return result;
@@ -109,11 +109,12 @@ public class WorkLoadDistance {
 		//finish setup 2 unknown queries
 		subsum=randomInsertQuery(k-2,result,Yp);
 		//finish setup k-2 queries
-		/*
+		
 		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);//debug*/
+		printWorkLoad(Yp);//debug
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
+		System.out.println("dYp="+dYp);//debug
 		rhs2 = d - dYp;
 		
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
