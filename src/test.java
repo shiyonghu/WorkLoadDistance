@@ -91,12 +91,43 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		largeCase1();
+		//largeCase1();
 		//smallCase();
-		//experiment();
+		maxdistance(3,5000);
+		//testf(13);
+
+	}
+	private static void testf(int numColumn){
+		System.out.println("numColumn="+numColumn);
+		float d=0.1f;//set d
+		float w=0.05f;//set w
+		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
+		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(6,numColumn);
+		System.out.println("Randomly generate W0: ");
+		printWorkLoad(W0);
+		System.out.println("Given W0 and d");
+		System.out.println("d=0.1, Y: ");
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, 0.1f, 8, 1000);
+		System.out.println("d=0.2, Y: ");
+		Y = D.randomizeY1(W0, 0.2f, 7, 1000);
+		System.out.println("d=0.3, Y: ");
+		Y = D.randomizeY1(W0, 0.3f, 7, 1000);
+		System.out.println("d=0.4, Y: ");
+		Y = D.randomizeY1(W0, 0.4f, 7, 1000);
+		System.out.println("d=0.5, Y: ");
+		Y = D.randomizeY1(W0, 0.5f, 7, 1000);
+		System.out.println("d=0.6, Y: ");
+		Y = D.randomizeY1(W0, 0.6f, 7, 1000);
+		System.out.println("d=0.7, Y: ");
+		Y = D.randomizeY1(W0, 0.7f, 7, 1000);
+		System.out.println("d=0.8, Y: ");
+		Y = D.randomizeY1(W0, 0.8f, 7, 1000);
+		System.out.println("d=0.9, Y: ");
+		Y = D.randomizeY1(W0, 0.9f, 7, 1000);
+		System.out.println("d=0.95, Y: ");
+		Y = D.randomizeY1(W0, 0.95f, 7, 1000);
 		
 	}
-	
 	private static void smallCase(){
 		float distance;
 		int n=3;
@@ -153,14 +184,14 @@ public class test {
 	private static void largeCase1(){
 		int numColumn=20;//set numColumn
 		float distance;
-		float d=10f;//set d
-		float w=0.1f;//set w
+		float d=0.1f;//set d
+		float w=0.05f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
-		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(8,numColumn);
+		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(5,numColumn);
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
-		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(8,numColumn);
+		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(5,numColumn);
 		System.out.println("Randomly generate W1: ");
 		printWorkLoad(W1);
 		distance=D.getDistance1(W0,W1);
@@ -169,8 +200,9 @@ public class test {
 		System.out.println("d2(W0,W1)= "+distance);
 		distance=D.getDistance2(W1,W0);
 		System.out.println("d2(W1,W0)= "+distance);
+		
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 9, 100);
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 7, 1000);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
@@ -178,8 +210,9 @@ public class test {
 		System.out.println("d1(Y,W0)= "+distance);
 		}
 		
+		d=0.9f;
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
-		Y = D.randomizeY2(W0, d, 4, 10);
+		Y = D.randomizeY2(W0, d, 9, 1000);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
@@ -189,8 +222,7 @@ public class test {
 		
 	}
 
-	private static void experiment(){
-		int numColumn=13;//set numColumn
+	private static void maxdistance(int numColumn, int trials){
 		float distance;
 		int parameter;
 		float max=0f;
@@ -198,9 +230,10 @@ public class test {
 		HashMap<Vector<Boolean>,Float> Y=new HashMap<Vector<Boolean>,Float>();
 		float w=1f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
-		int trials=5000;
-		int k=(int) (Math.pow(2,numColumn)-30);
-		k=90;
+		int k=(int) (Math.pow(2,numColumn)-3);
+		if (numColumn>=6)
+			k=60;
+ 		System.out.println("numColumn="+numColumn);
 		for (int i=1;i<=trials;i++){
 			parameter=r.nextInt(k-1)+2;
 //			System.out.println("parameter="+parameter);
@@ -217,10 +250,12 @@ public class test {
 				Y=W1;
 			}
 		}//for
-		System.out.println("after "+trials+" trials, max distance= "+max);
+		System.out.println("after "+trials+" trials, max distance= "+max*2*numColumn);
 		System.out.println("It's distance between X: ");
 		printWorkLoad(X);
 		System.out.println("and Y: ");
 		printWorkLoad(Y);
+		System.out.println("X - Y: ");
+		printWorkLoad(D.subtract(X, Y));
 	}
 }

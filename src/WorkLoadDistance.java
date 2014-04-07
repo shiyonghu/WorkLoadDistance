@@ -62,29 +62,47 @@ public class WorkLoadDistance {
 			}
 			sum+=subsum * entry.getValue();
 		}
-		return sum;
+		return sum/(numColumn*2);
 	}
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY1(HashMap<Vector<Boolean> ,Float> X, float d,int k,int trials){
 		HashMap<Vector<Boolean> ,Float> result=null;
 		int count=0;
-		while (count<trials){
-			result=randomizeY11(X,d,k);
-			count++;
-			if (result!=null)
-				break;
+		int xsize;
+		if (d>0){//d>0.1
+			while (count<trials){
+				result=randomizeY11(X,d,k);
+				count++;
+				if (result!=null)
+					break;
+			}
 		}
-		if (result==null)
+		else{
+			xsize=X.size();
+			if (k!=xsize){
+				k=xsize;
+				System.out.println("distance<=0.1, automatically change number of nonzero queries to "+k);
+			}
+			while (count<trials){
+				result=randomizeY12(X,d,k);
+				count++;
+				if (result!=null)
+					break;
+			}
+		}
+		if (result==null){
 			System.out.println("No solution in "+count+" trials");
+		}
 		else
 			System.out.println("Found solution in "+count+" trials");
 		return result;
 	}
 	
-	public HashMap<Vector<Boolean> ,Float> randomizeY11(HashMap<Vector<Boolean> ,Float> X, float d,int k)
+	public HashMap<Vector<Boolean> ,Float> randomizeY11(HashMap<Vector<Boolean> ,Float> X, float distance,int k)
 	{
 		//d1(result-X)=d
 		//x+y=1-subsum
+		float d=distance*2*numColumn;
 		float arr[]=new float[2];
 		float dYp,rhs1,rhs2,p;
 		Float x=0f,y=0f;
@@ -113,8 +131,10 @@ public class WorkLoadDistance {
 		//finish setup 2 unknown queries
 		int kk=k-2;
 		int ceil=(X.size()>=kk)?kk:X.size();
-		ceil=randomint(ceil);
-//		System.out.println("Ceil="+ceil);
+		if (distance>=0.2)
+			ceil=randomint(ceil);
+		if (distance>=0.9)
+			ceil=0;
 		int count=0;
 		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
 			if (count==ceil)
@@ -128,12 +148,10 @@ public class WorkLoadDistance {
 		}
 		subsum+=randomInsertQuery(kk,result,Yp);
 		//finish setup k-2 queries
-		
-//		System.out.println("The other k-2 queries");
-//		printWorkLoad(Yp);//debug
+	
 		rhs1=1-subsum;
-		dYp = getDistance1(Yp,X);	
-//		System.out.println("dYp="+dYp);//debug
+//		dYp = getDistance1(Yp,X);	
+		dYp = 2*numColumn*getDistance1(Yp,X);//changed
 		rhs2 = d - dYp;
 		
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
@@ -151,6 +169,89 @@ public class WorkLoadDistance {
 		result.put(ykey, y);
 		return result;
 	}
+	
+	public HashMap<Vector<Boolean> ,Float> randomizeY12(HashMap<Vector<Boolean> ,Float> X, float d,int k)
+	{	//X.size()>=2 and quite big (close to 2^numColumn)
+		//higher change to get solution if d is small
+		//+-d1(result-X)=d
+		//x+y=1-subsum
+		int i,r1,r2;
+		float arr[]=new float[2];
+		float dYp,xvalue,yvalue,rhs1,rhs2,p;
+		float xparameter=0f,yparameter=0f,xyparameter=0f,subsum=0f;
+		Float x=0f,y=0f;
+		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
+		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
+		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
+		HashMap<Vector<Boolean> ,Float> result = new HashMap<Vector<Boolean> ,Float>(k);
+		r1=randomint(X.size()-1);
+		r2=randomint(X.size()-1);
+		while (r2==r1){
+			r2=randomint(X.size()-1);
+		}
+		i=0;
+		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
+			if (i==r1){
+				xkey=entry.getKey();
+				result.put(xkey, 0f);
+			}
+			else if (i==r2){
+				ykey=entry.getKey();
+				result.put(ykey, 0f);
+			}	
+			i++;
+		}
+		//finish setup 2 unknown queries
+		float floor =X.get(xkey)+X.get(ykey);
+		floor-=0.01f;
+		float xplusy = (float)(r.nextFloat()*(floor) + 0.01);
+		subsum = 1-xplusy;
+		int count=1;
+		int terminate=X.size()-2;
+		float sub=0f;
+		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
+			if (entry.getKey()!=xkey && entry.getKey()!=ykey){
+				if (count==terminate){
+					p=subsum-sub;
+					result.put(entry.getKey(), p);
+					Yp.put(entry.getKey(), p);
+					break;
+				}
+				floor = (float) ((subsum/terminate)-0.01);
+				p=(float)(r.nextFloat()*(floor) + 0.01);
+				result.put(entry.getKey(), p);
+				Yp.put(entry.getKey(), p);
+				sub+=p;
+				count++;
+			}
+		}
+		//finish setup k-2 queries
+		//printWorkLoad(Yp);
+		rhs1=1-subsum;
+		dYp = getDistance1(Yp,X);
+		rhs2 = d - dYp;
+
+		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
+		xvalue=YpminusX.remove(xkey);
+		xparameter=-1*getXParameter(YpminusX,xkey);
+		YpminusX.put(xkey, xvalue);
+		yvalue=YpminusX.remove(ykey);
+		yparameter=-1*getYParameter(YpminusX,ykey);
+		YpminusX.put(ykey, yvalue);
+		xyparameter=cValue(ykey,xkey)*2;
+		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
+			//System.out.println("No solution this time. You may try again or change to a larger distance.");
+			return null;
+		}
+		x=arr[0];
+		y=arr[1];
+		if (x>X.get(xkey) || y>X.get(ykey))
+			return null;
+		result.put(xkey, x);
+		result.put(ykey, y);
+		return result;
+	}
+
 	
 	private float getXParameter(HashMap<Vector<Boolean> ,Float> YpminusX,Vector<Boolean> xkey){
 		float xparameter=0f;
@@ -262,6 +363,8 @@ public class WorkLoadDistance {
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
 		rhs2 = d - dYp - w*getSigma(result,X);
+		if (rhs2<0) return null;
+		rhs2*=2*numColumn;
 		
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
 		xparameter=getXParameter( YpminusX,xkey);
