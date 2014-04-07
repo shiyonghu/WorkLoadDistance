@@ -65,15 +65,19 @@ public class WorkLoadDistance {
 		return sum;
 	}
 	
-	public HashMap<Vector<Boolean> ,Float> randomizeY1(HashMap<Vector<Boolean> ,Float> X, float d,int k){
+	public HashMap<Vector<Boolean> ,Float> randomizeY1(HashMap<Vector<Boolean> ,Float> X, float d,int k,int trials){
 		HashMap<Vector<Boolean> ,Float> result=null;
-		
-		result = randomizeY11(X,d,k);
-		if (result==null && X.size()>=2){
-			result=randomizeY12(X,d,k);
+		int count=0;
+		while (count<trials){
+			result=randomizeY11(X,d,k);
+			count++;
+			if (result!=null)
+				break;
 		}
 		if (result==null)
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			System.out.println("No solution in "+count+" trials");
+		else
+			System.out.println("Found solution in "+count+" trials");
 		return result;
 	}
 	
@@ -82,7 +86,7 @@ public class WorkLoadDistance {
 		//d1(result-X)=d
 		//x+y=1-subsum
 		float arr[]=new float[2];
-		float dYp,rhs1,rhs2;
+		float dYp,rhs1,rhs2,p;
 		Float x=0f,y=0f;
 		float xparameter=0f,yparameter=0f,xyparameter=0f;
 		float subsum=0f;//sum of p
@@ -107,20 +111,35 @@ public class WorkLoadDistance {
 		ykey=vec;
 		result.put(vec, 0f);
 		//finish setup 2 unknown queries
-		subsum=randomInsertQuery(k-2,result,Yp);
+		int kk=k-2;
+		int ceil=(X.size()>=kk)?kk:X.size();
+		ceil=randomint(ceil);
+//		System.out.println("Ceil="+ceil);
+		int count=0;
+		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
+			if (count==ceil)
+				break;
+			p=getP(k-2);
+			subsum+=p;
+			result.put(entry.getKey(), p);
+			Yp.put(entry.getKey(), p);
+			kk--;
+			count++;
+		}
+		subsum+=randomInsertQuery(kk,result,Yp);
 		//finish setup k-2 queries
 		
-		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);//debug
+//		System.out.println("The other k-2 queries");
+//		printWorkLoad(Yp);//debug
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
-		System.out.println("dYp="+dYp);//debug
+//		System.out.println("dYp="+dYp);//debug
 		rhs2 = d - dYp;
 		
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
 		xparameter=getXParameter( YpminusX,xkey);
 		yparameter=getYParameter(YpminusX,ykey);
-		xyparameter=cValue(ykey,xkey)*2;
+		xyparameter=(float)cValue(ykey,xkey)*2.0f;
 		
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
 			//System.out.println("No solution this time. You may try again or change to a larger distance.");
@@ -160,6 +179,8 @@ public class WorkLoadDistance {
 		float p;
 		Vector<Boolean> vec;
 		int i;
+		if (num<=0)
+			return 0;
 		for (i=1;i<=num;i++){
 			vec=genVector();
 			if (result.containsKey(vec)){//have already generated that key
@@ -174,86 +195,30 @@ public class WorkLoadDistance {
 		return subsum;
 	}
 	
-	public HashMap<Vector<Boolean> ,Float> randomizeY12(HashMap<Vector<Boolean> ,Float> X, float d,int k)
-	{	//X.size()>=2 and quite big (close to 2^numColumn)
-		//higher change to get solution if d is small
-		//+-d1(result-X)=d
-		//x+y=1-subsum
-		int i,r1,r2;
-		float arr[]=new float[2];
-		float dYp,xvalue,yvalue,rhs1,rhs2;
-		float xparameter=0f,yparameter=0f,xyparameter=0f,subsum=0f;
-		Float x=0f,y=0f;
-		//Vector<Boolean> vec = new Vector<Boolean>(numColumn);
-		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
-		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
-		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
-		HashMap<Vector<Boolean> ,Float> result = new HashMap<Vector<Boolean> ,Float>(k);
-		r1=randomint(X.size()-1);
-		r2=randomint(X.size()-1);
-		while (r2==r1){
-			r2=randomint(X.size()-1);
-		}
-		i=0;
-		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
-			if (i==r1){
-				xkey=entry.getKey();
-				result.put(xkey, 0f);
-			}
-			else if (i==r2){
-				ykey=entry.getKey();
-				result.put(ykey, 0f);
-			}	
-			i++;
-		}
-		//finish setup 2 unknown queries
-		subsum=randomInsertQuery(k-2,result,Yp);
-		//finish setup k-2 queries
-		/*
-		System.out.println("The other k-2 queries");
-		printWorkLoad(Yp);*/
-		rhs1=1-subsum;
-		dYp = getDistance1(Yp,X);
-		rhs2 = d - dYp;
-		
-		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
-		xvalue=YpminusX.remove(xkey);
-		xparameter=getXParameter(YpminusX,xkey);
-		YpminusX.put(xkey, xvalue);
-		yvalue=YpminusX.remove(ykey);
-		yparameter=getYParameter(YpminusX,ykey);
-		YpminusX.put(ykey, yvalue);
-		xyparameter=cValue(ykey,xkey)*2;
-		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			//System.out.println("No solution this time. You may try again or change to a larger distance.");
-			return null;
-		}
-		x=arr[0];
-		y=arr[1];
-		result.put(xkey, x);
-		result.put(ykey, y);
-		return result;
-	}
 	
-	
-	public HashMap<Vector<Boolean> ,Float> randomizeY2(HashMap<Vector<Boolean> ,Float> X, float d,int k)
+	public HashMap<Vector<Boolean> ,Float> randomizeY2(HashMap<Vector<Boolean> ,Float> X, float d,int k,int trials)
 	{
 		//d2(result-X)=d
 		//x+y=1-subsum
 		HashMap<Vector<Boolean> ,Float> result=null;
-		result= randomizeY21(X,d,k);
-		if (result==null && X.size()>=2){
-			result=randomizeY22(X,d,k);
+		int count=0;
+		while (count<trials){
+			result=randomizeY21(X,d,k);
+			count++;
+			if (result!=null)
+				break;
 		}
 		if (result==null)
-			System.out.println("No solution this time. You may try again or change to a larger distance.");
+			System.out.println("No solution in "+count+" trials");
+		else
+			System.out.println("Found solution in "+count+" trials");
 		return result;
 	}
 	
 	public HashMap<Vector<Boolean> ,Float> randomizeY21(HashMap<Vector<Boolean> ,Float> X, float d,int k)
 	{
 		float arr[]=new float[2];
-		float dYp,rhs1,rhs2;
+		float dYp,rhs1,rhs2,p;
 		Float x=0f,y=0f;
 		float xparameter=0f,yparameter=0f,xyparameter=0f;
 		float subsum=0f;//sum of p
@@ -278,7 +243,21 @@ public class WorkLoadDistance {
 		ykey=vec;
 		result.put(vec, 0.1f);
 		//finish setup 2 unknown queries
-		subsum=randomInsertQuery(k-2,result,Yp);
+		int kk=k-2;
+		int ceil=(X.size()>=kk)?kk:X.size();
+		ceil=randomint(ceil);
+		int count=0;
+		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
+			if (count==ceil)
+				break;
+			p=getP(k-2);
+			subsum+=p;
+			result.put(entry.getKey(), p);
+			Yp.put(entry.getKey(), p);
+			kk--;
+			count++;
+		}
+		subsum+=randomInsertQuery(kk,result,Yp);
 		//finish setup k-2 queries
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);	
@@ -287,63 +266,6 @@ public class WorkLoadDistance {
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
 		xparameter=getXParameter( YpminusX,xkey);
 		yparameter=getYParameter(YpminusX,ykey);
-		xyparameter=cValue(ykey,xkey)*2;
-		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			//System.out.println("No solution this time. You may try again or change to a larger distance.");
-			return null;
-		}
-		x=arr[0];
-		y=arr[1];
-		result.put(xkey, x);
-		result.put(ykey, y);
-		return result;
-	}
-	
-	public HashMap<Vector<Boolean> ,Float> randomizeY22(HashMap<Vector<Boolean> ,Float> X, float d,int k)
-	{	//X.size()>=2 and quite big (close to 2^numColumn)
-		//higher change to get solution if d is small
-		//+-d1(result-X)=d
-		//x+y=1-subsum
-		int i,r1,r2;
-		float arr[]=new float[2];
-		float dYp,xvalue,yvalue,rhs1,rhs2;
-		float xparameter=0f,yparameter=0f,xyparameter=0f,subsum=0f;
-		Float x=0f,y=0f;
-		Vector<Boolean> xkey = new Vector<Boolean>(numColumn);
-		Vector<Boolean> ykey = new Vector<Boolean>(numColumn);
-		HashMap<Vector<Boolean> ,Float> Yp = new HashMap<Vector<Boolean> ,Float>(k-2);
-		HashMap<Vector<Boolean> ,Float> result = new HashMap<Vector<Boolean> ,Float>(k);
-		r1=randomint(X.size()-1);
-		r2=randomint(X.size()-1);
-		while (r2==r1){
-			r2=randomint(X.size()-1);
-		}
-		i=0;
-		for (Map.Entry<Vector<Boolean>,Float> entry: X.entrySet()){
-			if (i==r1){
-				xkey=entry.getKey();
-				result.put(xkey, 0.1f);
-			}
-			else if (i==r2){
-				ykey=entry.getKey();
-				result.put(ykey, 0.1f);
-			}	
-			i++;
-		}
-		//finish setup 2 unknown queries
-		subsum=randomInsertQuery(k-2,result,Yp);
-		//finish setup k-2 queries
-		rhs1=1-subsum;
-		dYp = getDistance1(Yp,X);
-		rhs2 = d - dYp - w*getSigma(X,result);
-		
-		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
-		xvalue=YpminusX.remove(xkey);
-		xparameter=getXParameter(YpminusX,xkey);
-		YpminusX.put(xkey, xvalue);
-		yvalue=YpminusX.remove(ykey);
-		yparameter=getYParameter(YpminusX,ykey);
-		YpminusX.put(ykey, yvalue);
 		xyparameter=cValue(ykey,xkey)*2;
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
 			//System.out.println("No solution this time. You may try again or change to a larger distance.");

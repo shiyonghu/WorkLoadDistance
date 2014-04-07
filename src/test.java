@@ -2,17 +2,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
+import java.lang.Math;
 
 public class test {
 	private static Random r=new Random();
 	private static Vector<Boolean> genVector(int numColumn){
 		//random generate Vector<Boolean> with size numColumn
-		Vector<Boolean> result = new Vector<Boolean>(numColumn);
 		Boolean element;
-		for(int i = 0; i < numColumn; i++)
+		Vector<Boolean> result = new Vector<Boolean>(numColumn);
+		Boolean done = false;
+		int count = 0;
+		while(!done)
 		{
-			element = r.nextBoolean();				
-			result.add(element);
+			count = 0;
+			Vector<Boolean> temp = new Vector<Boolean>(numColumn);
+			for(int i = 0; i < numColumn; i++)
+			{
+				element = r.nextBoolean();				
+				temp.add(element);
+				if(!element) count++;
+			}
+			if(count < numColumn) {
+				done = true;
+				result = temp;
+			}
 		}
 		return result;
 	}
@@ -30,7 +43,7 @@ public class test {
 		HashMap<Vector<Boolean>,Float> W = new HashMap<Vector<Boolean>,Float>(numColumn);
 		float subsum=0;
 		float p;
-		Vector<Boolean> vec;
+		Vector<Boolean> vec=null;
 		int i;
 		for (i=1;i<num;i++){
 			vec=genVector(numColumn);
@@ -42,11 +55,12 @@ public class test {
 			subsum+=p;
 			W.put(vec, p);
 		}//finish setup num-1 queries
-		vec=genVector(numColumn);
-		if (!W.containsKey(vec)){//don't have that key
-			p=1-subsum;
-			W.put(vec, p);
+		while (W.containsKey(vec)){
+			vec=genVector(numColumn);
 		}
+		
+		p=1-subsum;
+		W.put(vec, p);
 		return W;
 	}
 	public static void printWorkLoad(HashMap<Vector<Boolean> ,Float> W)
@@ -79,6 +93,7 @@ public class test {
 		// TODO Auto-generated method stub
 		largeCase1();
 		//smallCase();
+		//experiment();
 		
 	}
 	
@@ -124,7 +139,7 @@ public class test {
 		System.out.print("d2(W0,W1): ");
 		distance=D.getDistance2(W1, W2);
 		System.out.println(distance);
-		HashMap<Vector<Boolean> ,Float> Y=D.randomizeY11(W2, 4f, 4);
+		HashMap<Vector<Boolean> ,Float> Y=D.randomizeY1(W2, 4f, 4,10);
 		
 		System.out.print("f(W0,0.015,4)=");
 		printWorkLoad(Y);
@@ -138,41 +153,74 @@ public class test {
 	private static void largeCase1(){
 		int numColumn=20;//set numColumn
 		float distance;
-		float d=35f;//set d
+		float d=10f;//set d
 		float w=0.1f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
-		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(5,numColumn);
+		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(8,numColumn);
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
-		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(5,numColumn);
+		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(8,numColumn);
 		System.out.println("Randomly generate W1: ");
 		printWorkLoad(W1);
 		distance=D.getDistance1(W0,W1);
 		System.out.println("d1(W0,W1)= "+distance);
-		distance=D.getDistance1(W0,W1);
-		
-		System.out.println("d1(W1,W0)= "+distance);
-		distance=D.getDistance1(W1,W0);
+		distance=D.getDistance2(W0,W1);
 		System.out.println("d2(W0,W1)= "+distance);
+		distance=D.getDistance2(W1,W0);
+		System.out.println("d2(W1,W0)= "+distance);
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 4);
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 9, 100);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
 		distance=D.getDistance1(Y,W0);
 		System.out.println("d1(Y,W0)= "+distance);
 		}
-		/*
+		
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
-		Y = D.randomizeY2(W0, d, 4);
+		Y = D.randomizeY2(W0, d, 4, 10);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
 		distance=D.getDistance2(Y,W0);
-		System.out.println("d(Y,W0)= "+distance);
+		System.out.println("d2(Y,W0)= "+distance);
 		}
-		*/
+		
 	}
-	
+
+	private static void experiment(){
+		int numColumn=13;//set numColumn
+		float distance;
+		int parameter;
+		float max=0f;
+		HashMap<Vector<Boolean>,Float> X = new HashMap<Vector<Boolean>,Float>();
+		HashMap<Vector<Boolean>,Float> Y=new HashMap<Vector<Boolean>,Float>();
+		float w=1f;//set w
+		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
+		int trials=5000;
+		int k=(int) (Math.pow(2,numColumn)-30);
+		k=90;
+		for (int i=1;i<=trials;i++){
+			parameter=r.nextInt(k-1)+2;
+//			System.out.println("parameter="+parameter);
+			HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(parameter,numColumn);
+//			printWorkLoad(W0);
+			parameter=r.nextInt(k-1)+2;
+//			System.out.println("parameter="+parameter);
+			HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(parameter,numColumn);
+//			printWorkLoad(W1);
+			distance=D.getDistance1(W0,W1);
+			if (distance>max){
+				max=distance;
+				X=W0;
+				Y=W1;
+			}
+		}//for
+		System.out.println("after "+trials+" trials, max distance= "+max);
+		System.out.println("It's distance between X: ");
+		printWorkLoad(X);
+		System.out.println("and Y: ");
+		printWorkLoad(Y);
+	}
 }
