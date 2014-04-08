@@ -55,6 +55,7 @@ public class test {
 			subsum+=p;
 			W.put(vec, p);
 		}//finish setup num-1 queries
+		vec=genVector(numColumn);
 		while (W.containsKey(vec)){
 			vec=genVector(numColumn);
 		}
@@ -91,10 +92,10 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//largeCase1();
+		largeCase1();
 		//smallCase();
-		maxdistance(3,5000);
-		//testf(13);
+		//maxdistance(3,3000);
+		//testf(50);
 
 	}
 	private static void testf(int numColumn){
@@ -106,8 +107,10 @@ public class test {
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
 		System.out.println("Given W0 and d");
+		System.out.println("d=0.05, Y: ");
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, 0.05f, 7, 1000);
 		System.out.println("d=0.1, Y: ");
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, 0.1f, 8, 1000);
+		Y = D.randomizeY1(W0, 0.1f, 8, 1000);
 		System.out.println("d=0.2, Y: ");
 		Y = D.randomizeY1(W0, 0.2f, 7, 1000);
 		System.out.println("d=0.3, Y: ");
@@ -125,7 +128,7 @@ public class test {
 		System.out.println("d=0.9, Y: ");
 		Y = D.randomizeY1(W0, 0.9f, 7, 1000);
 		System.out.println("d=0.95, Y: ");
-		Y = D.randomizeY1(W0, 0.95f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.95f, 30, 1000);
 		
 	}
 	private static void smallCase(){
@@ -184,7 +187,7 @@ public class test {
 	private static void largeCase1(){
 		int numColumn=20;//set numColumn
 		float distance;
-		float d=0.1f;//set d
+		float d=0.05f;//set d
 		float w=0.05f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
@@ -202,7 +205,7 @@ public class test {
 		System.out.println("d2(W1,W0)= "+distance);
 		
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 7, 1000);
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 7, 500);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
@@ -210,9 +213,9 @@ public class test {
 		System.out.println("d1(Y,W0)= "+distance);
 		}
 		
-		d=0.9f;
+		d=0.7f;
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
-		Y = D.randomizeY2(W0, d, 9, 1000);
+		Y = D.randomizeY2(W0, d, 6, 500);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
