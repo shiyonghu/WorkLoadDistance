@@ -185,16 +185,16 @@ public class test {
 	}
 
 	private static void largeCase1(){
-		int numColumn=20;//set numColumn
+		int numColumn=13;//set numColumn
 		float distance;
 		float d=0.05f;//set d
 		float w=0.05f;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
-		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(5,numColumn);
+		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(3,numColumn);
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
-		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(5,numColumn);
+		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(3,numColumn);
 		System.out.println("Randomly generate W1: ");
 		printWorkLoad(W1);
 		distance=D.getDistance1(W0,W1);
@@ -205,7 +205,7 @@ public class test {
 		System.out.println("d2(W1,W0)= "+distance);
 		
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 7, 500);
+		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 4, 500);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
@@ -213,9 +213,9 @@ public class test {
 		System.out.println("d1(Y,W0)= "+distance);
 		}
 		
-		d=0.7f;
+		d=0.003f;
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
-		Y = D.randomizeY2(W0, d, 6, 500);
+		Y = D.randomizeY2(W0, d, 5, 500);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){

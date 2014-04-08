@@ -360,24 +360,22 @@ public class WorkLoadDistance {
 		}
 		subsum+=randomInsertQuery(kk,result,Yp);
 		//finish setup k-2 queries
+		int n = (int) (Math.pow(2, numColumn)-1);
 		rhs1=1-subsum;
 		dYp = getDistance1(Yp,X);
 		HashMap<Vector<Boolean> ,Float> resultcp = new HashMap<Vector<Boolean> ,Float>(result);
 		HashMap<Vector<Boolean> ,Float> Xcp = new HashMap<Vector<Boolean> ,Float>(X);
-		rhs2 = (d - w*getSigma(resultcp,Xcp) - dYp) *2*numColumn;
-//		System.out.println("ceil="+ceil);
-//		System.out.println("Sigma="+getSigma(resultcp,Xcp));
-// 		System.out.println("before, rhs2="+rhs2);
+		
+		rhs2=(float) ( d*(w*n+1) - w*getSigma(resultcp,Xcp) );
+		rhs2-=dYp;
+		rhs2*=2*numColumn;
 		if (rhs2<0) return null;
-//		rhs2*=2*numColumn;
-//		System.out.println("after, rhs2="+rhs2);
 		
 		HashMap<Vector<Boolean> ,Float> YpminusX = subtract(Yp,X);
 		xparameter=getXParameter( YpminusX,xkey);
 		yparameter=getYParameter(YpminusX,ykey);
 		xyparameter=cValue(ykey,xkey)*2;
 		if(! solveSQE(rhs1, rhs2, xparameter, xyparameter, yparameter,arr) ){
-			//System.out.println("No solution this time. You may try again or change to a larger distance.");
 			return null;
 		}
 		x=arr[0];
@@ -478,10 +476,11 @@ public class WorkLoadDistance {
 	public float getDistance2(HashMap<Vector<Boolean> ,Float> X, HashMap<Vector<Boolean> ,Float> Y) {
 		float d1=getDistance1(X,Y);
 		int sum;
+		int n = (int) (Math.pow(2,numColumn)-1);
 		HashMap<Vector<Boolean> ,Float> Xcopy = new HashMap<Vector<Boolean> ,Float>(X);
 		HashMap<Vector<Boolean> ,Float> Ycopy = new HashMap<Vector<Boolean> ,Float>(Y);
 		sum=getSigma(Xcopy,Ycopy);
-		return d1+w*sum;
+		return (float) ( (d1+w*sum)/(w*n+1) );
 	}
 	
 	public int getSigma(HashMap<Vector<Boolean> ,Float> Xcopy, HashMap<Vector<Boolean> ,Float> Ycopy){
