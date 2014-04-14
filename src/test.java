@@ -30,19 +30,19 @@ public class test {
 		return result;
 	}
 	
-	private static float getP(int k) {
-		// generate float 0.01<=p<1/k
-		float result;
-		float floor =(float) 1/k;
+	private static Double getP(int k) {
+		// generate Double 0.01<=p<1/k
+		Double result;
+		Double floor = (double) (1/k);
 		floor-=0.01f;
-		result = (float)(r.nextFloat()*(floor) + 0.01);
+		result = (Double)(r.nextDouble()*(floor) + 0.01);
 		return result;
 	}
-	private static HashMap<Vector<Boolean>,Float> randomInsertQuery(int num,int numColumn){
+	private static HashMap<Vector<Boolean>,Double> randomInsertQuery(int num,int numColumn){
 		//random generate Workload with num non-zero queries
-		HashMap<Vector<Boolean>,Float> W = new HashMap<Vector<Boolean>,Float>(numColumn);
-		float subsum=0;
-		float p;
+		HashMap<Vector<Boolean>,Double> W = new HashMap<Vector<Boolean>,Double>(numColumn);
+		Double subsum=0d;
+		Double p;
 		Vector<Boolean> vec=null;
 		int i;
 		for (i=1;i<num;i++){
@@ -64,13 +64,13 @@ public class test {
 		W.put(vec, p);
 		return W;
 	}
-	public static void printWorkLoad(HashMap<Vector<Boolean> ,Float> W)
+	public static void printWorkLoad(HashMap<Vector<Boolean> ,Double> W)
 	{
 		if (W==null){
 			System.out.println("WorkLoad is empty");
 			return;
 		}
-		for (Map.Entry<Vector<Boolean>,Float> entry: W.entrySet())
+		for (Map.Entry<Vector<Boolean>,Double> entry: W.entrySet())
 		{
 			Vector<Boolean> Key = entry.getKey();
 			System.out.print("<[");
@@ -92,49 +92,49 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		largeCase1();
-		//smallCase();
+		//largeCase1();
+		smallCase();
 		//maxdistance(3,3000);
 		//testf(50);
 
 	}
 	private static void testf(int numColumn){
 		System.out.println("numColumn="+numColumn);
-		float d=0.1f;//set d
-		float w=0.05f;//set w
+		Double d=0.1d;//set d
+		Double w=0.05d;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
-		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(6,numColumn);
+		HashMap<Vector<Boolean>,Double> W0=randomInsertQuery(6,numColumn);
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
 		System.out.println("Given W0 and d");
 		System.out.println("d=0.05, Y: ");
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, 0.05f, 7, 1000);
+		HashMap<Vector<Boolean>,Double> Y = D.randomizeY1(W0, 0.05d, 7, 1000);
 		System.out.println("d=0.1, Y: ");
-		Y = D.randomizeY1(W0, 0.1f, 8, 1000);
+		Y = D.randomizeY1(W0, 0.1d, 8, 1000);
 		System.out.println("d=0.2, Y: ");
-		Y = D.randomizeY1(W0, 0.2f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.2d, 7, 1000);
 		System.out.println("d=0.3, Y: ");
-		Y = D.randomizeY1(W0, 0.3f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.3d, 7, 1000);
 		System.out.println("d=0.4, Y: ");
-		Y = D.randomizeY1(W0, 0.4f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.4d, 7, 1000);
 		System.out.println("d=0.5, Y: ");
-		Y = D.randomizeY1(W0, 0.5f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.5d, 7, 1000);
 		System.out.println("d=0.6, Y: ");
-		Y = D.randomizeY1(W0, 0.6f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.6d, 7, 1000);
 		System.out.println("d=0.7, Y: ");
-		Y = D.randomizeY1(W0, 0.7f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.7d, 7, 1000);
 		System.out.println("d=0.8, Y: ");
-		Y = D.randomizeY1(W0, 0.8f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.8d, 7, 1000);
 		System.out.println("d=0.9, Y: ");
-		Y = D.randomizeY1(W0, 0.9f, 7, 1000);
+		Y = D.randomizeY1(W0, 0.9d, 7, 1000);
 		System.out.println("d=0.95, Y: ");
-		Y = D.randomizeY1(W0, 0.95f, 30, 1000);
+		Y = D.randomizeY1(W0, 0.95d, 30, 1000);
 		
 	}
 	private static void smallCase(){
-		float distance;
+		Double distance;
 		int n=3;
-		WorkLoadDistance D = new WorkLoadDistance(n,0.1f);
+		WorkLoadDistance D = new WorkLoadDistance(n,0.1d);
 		
 		Vector<Boolean> v1 = new Vector<Boolean>(n);
 		Vector<Boolean> v3 = new Vector<Boolean>(n);
@@ -149,16 +149,16 @@ public class test {
 		v4.addElement(false);
 		v4.addElement(false);
 		
-		HashMap<Vector<Boolean> ,Float> W0 = new HashMap<Vector<Boolean> ,Float>(2);
-		HashMap<Vector<Boolean> ,Float> W1 = new HashMap<Vector<Boolean> ,Float>(2);
-		HashMap<Vector<Boolean> ,Float> W2 = new HashMap<Vector<Boolean> ,Float>(3);
-		W0.put(v1,0.1f);
-		W0.put(v4,0.9f);
-		W1.put(v1,0.15f);
-		W1.put(v4,0.85f);
-		W2.put(v1, 0.1f);
-		W2.put(v3, 0.05f);
-		W2.put(v4, 0.85f);
+		HashMap<Vector<Boolean> ,Double> W0 = new HashMap<Vector<Boolean> ,Double>(2);
+		HashMap<Vector<Boolean> ,Double> W1 = new HashMap<Vector<Boolean> ,Double>(2);
+		HashMap<Vector<Boolean> ,Double> W2 = new HashMap<Vector<Boolean> ,Double>(3);
+		W0.put(v1,0.1d);
+		W0.put(v4,0.9d);
+		W1.put(v1,0.15d);
+		W1.put(v4,0.85d);
+		W2.put(v1, 0.1d);
+		W2.put(v3, 0.05d);
+		W2.put(v4, 0.85d);
 		
 		System.out.print("W0:");
 		printWorkLoad(W0);
@@ -173,7 +173,7 @@ public class test {
 		System.out.print("d2(W0,W1): ");
 		distance=D.getDistance2(W1, W2);
 		System.out.println(distance);
-		HashMap<Vector<Boolean> ,Float> Y=D.randomizeY1(W2, 4f, 4,10);
+		HashMap<Vector<Boolean> ,Double> Y=D.randomizeY1(W2, 4d, 4,10);
 		
 		System.out.print("f(W0,0.015,4)=");
 		printWorkLoad(Y);
@@ -186,15 +186,15 @@ public class test {
 
 	private static void largeCase1(){
 		int numColumn=13;//set numColumn
-		float distance;
-		float d=0.05f;//set d
-		float w=0.05f;//set w
+		Double distance;
+		Double d=0.05d;//set d
+		Double w=0.05d;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		System.out.println("w="+w);
-		HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(3,numColumn);
+		HashMap<Vector<Boolean>,Double> W0=randomInsertQuery(3,numColumn);
 		System.out.println("Randomly generate W0: ");
 		printWorkLoad(W0);
-		HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(3,numColumn);
+		HashMap<Vector<Boolean>,Double> W1=randomInsertQuery(3,numColumn);
 		System.out.println("Randomly generate W1: ");
 		printWorkLoad(W1);
 		distance=D.getDistance1(W0,W1);
@@ -205,7 +205,7 @@ public class test {
 		System.out.println("d2(W1,W0)= "+distance);
 		
 		System.out.println("Given W0 and d1(Y,W0)= "+d);
-		HashMap<Vector<Boolean>,Float> Y = D.randomizeY1(W0, d, 4, 500);
+		HashMap<Vector<Boolean>,Double> Y = D.randomizeY1(W0, d, 4, 500);
 		System.out.println("Y: ");
 		printWorkLoad(Y);
 		if (Y!=null){
@@ -213,7 +213,7 @@ public class test {
 		System.out.println("d1(Y,W0)= "+distance);
 		}
 		
-		d=0.003f;
+		d=0.003d;
 		System.out.println("Given W0 and d2(Y,W0)= "+d);
 		Y = D.randomizeY2(W0, d, 5, 500);
 		System.out.println("Y: ");
@@ -226,12 +226,12 @@ public class test {
 	}
 
 	private static void maxdistance(int numColumn, int trials){
-		float distance;
+		Double distance;
 		int parameter;
-		float max=0f;
-		HashMap<Vector<Boolean>,Float> X = new HashMap<Vector<Boolean>,Float>();
-		HashMap<Vector<Boolean>,Float> Y=new HashMap<Vector<Boolean>,Float>();
-		float w=1f;//set w
+		Double max=0d;
+		HashMap<Vector<Boolean>,Double> X = new HashMap<Vector<Boolean>,Double>();
+		HashMap<Vector<Boolean>,Double> Y=new HashMap<Vector<Boolean>,Double>();
+		Double w=1d;//set w
 		WorkLoadDistance D = new WorkLoadDistance(numColumn,w);
 		int k=(int) (Math.pow(2,numColumn)-3);
 		if (numColumn>=6)
@@ -240,11 +240,11 @@ public class test {
 		for (int i=1;i<=trials;i++){
 			parameter=r.nextInt(k-1)+2;
 //			System.out.println("parameter="+parameter);
-			HashMap<Vector<Boolean>,Float> W0=randomInsertQuery(parameter,numColumn);
+			HashMap<Vector<Boolean>,Double> W0=randomInsertQuery(parameter,numColumn);
 //			printWorkLoad(W0);
 			parameter=r.nextInt(k-1)+2;
 //			System.out.println("parameter="+parameter);
-			HashMap<Vector<Boolean>,Float> W1=randomInsertQuery(parameter,numColumn);
+			HashMap<Vector<Boolean>,Double> W1=randomInsertQuery(parameter,numColumn);
 //			printWorkLoad(W1);
 			distance=D.getDistance1(W0,W1);
 			if (distance>max){
