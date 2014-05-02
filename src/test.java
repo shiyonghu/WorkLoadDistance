@@ -93,7 +93,7 @@ public class test {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//largeCase1();
-		smallCase();
+		//smallCase();
 		//maxdistance(3,3000);
 		//testf(50);
 
